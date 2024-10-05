@@ -1,4 +1,4 @@
-# CDN-V2 - simple and fast cdn w/hono
+# CDN-V2 - Fast file server w/hono
 
 ## これはなに
 
@@ -19,6 +19,11 @@ To install dependencies:
 ```sh
 bun install
 ```
+
+To configure:
+
+1. create and open `config.json`,
+2. edit like [this](https://github.com/ringo360/CDN-v2/blob/main/config.json.example)
 
 To run:
 ```sh
