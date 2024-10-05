@@ -1,9 +1,22 @@
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
+import { basicAuth } from 'hono/basic-auth';
+import { getFileList } from './utils/FileList';
+
+import config from '../config.json';
 
 const app = new Hono();
 
 app.use('/assets/*', serveStatic({ root: './' }));
+
+app.use(
+	'/private/*',
+	basicAuth({
+		username: config.auth.user,
+		password: config.auth.password,
+	})
+);
+
 app.use(
 	'/*',
 	serveStatic({
@@ -12,7 +25,14 @@ app.use(
 );
 
 app.get('/', async (c) => {
-	return c.text('Hello Sekai!');
+	const result = await getFileList('./');
+	return c.json(result);
+});
+
+app.get('/:path', async (c) => {
+	const result = await getFileList(c.req.param('path'));
+	console.log(result);
+	return c.json(result);
 });
 
 app.get('/favicon.ico', async (c) => {
@@ -24,4 +44,8 @@ app.notFound(async (c) => {
 });
 
 console.log('Ready.');
-export default app;
+
+export default {
+	port: config.port,
+	fetch: app.fetch,
+};

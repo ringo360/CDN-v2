@@ -1,4 +1,4 @@
-import { readdir } from 'fs/promises';
+import * as fs from 'fs/promises';
 import { join } from 'path';
 
 export interface DirectoryEntry {
@@ -26,6 +26,33 @@ function formatFileSize(bytes: number) {
 }
 
 export async function getFileList(folder: string) {
-	const dirpath = join('files', folder);
-	let files = await readdir(dirpath);
+	try {
+		const dirpath = join('files', folder);
+		let files = await fs.readdir(dirpath);
+		return await Promise.all(
+			files.map(async (file) => {
+				let stat = await fs.stat(join(dirpath, file));
+				return {
+					directory: stat.isDirectory(),
+					file: stat.isFile(),
+					name: file,
+					size: stat.size,
+					sizeStr: formatFileSize(stat.size),
+				};
+			})
+		);
+	} catch (e: any) {
+		console.log(e);
+		if (e.code == 'ENOENT') {
+			return {
+				error: '404',
+				notfound: true,
+			};
+		} else {
+			return {
+				error: `${e}`,
+				notfound: false,
+			};
+		}
+	}
 }
