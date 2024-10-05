@@ -42,13 +42,13 @@ export async function getFileList(folder: string) {
 			})
 		);
 	} catch (e: any) {
-		console.log(e);
 		if (e.code == 'ENOENT') {
 			return {
 				error: '404',
 				notfound: true,
 			};
 		} else {
+			console.log(e);
 			return {
 				error: `${e}`,
 				notfound: false,

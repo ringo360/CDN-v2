@@ -8,7 +8,15 @@ import config from '../config.json';
 const app = new Hono();
 
 app.use('/assets/*', serveStatic({ root: './' }));
-
+app.use(
+	'/favicon.ico',
+	serveStatic({
+		root: './assets/',
+		onNotFound: (path, c) => {
+			console.log(`${path} is not found, you access ${c.req.path}`);
+		},
+	})
+);
 app.use(
 	'/private/*',
 	basicAuth({
@@ -16,7 +24,6 @@ app.use(
 		password: config.auth.password,
 	})
 );
-
 app.use(
 	'/*',
 	serveStatic({
@@ -31,12 +38,7 @@ app.get('/', async (c) => {
 
 app.get('/:path', async (c) => {
 	const result = await getFileList(c.req.param('path'));
-	console.log(result);
 	return c.json(result);
-});
-
-app.get('/favicon.ico', async (c) => {
-	return app.request('/assets/favicon.ico');
 });
 
 app.notFound(async (c) => {
