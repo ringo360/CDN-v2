@@ -25,7 +25,14 @@ function formatFileSize(bytes: number) {
 	}
 }
 
-export async function getFileList(folder: string) {
+interface FileItem {
+	directory: boolean;
+	file: boolean;
+	name: string;
+	size: number;
+	sizeStr: string;
+}
+export async function getFileList(folder: string): Promise<Array<FileItem>> {
 	try {
 		const dirpath = join('files', folder);
 		let files = await fs.readdir(dirpath);
@@ -42,17 +49,6 @@ export async function getFileList(folder: string) {
 			})
 		);
 	} catch (e: any) {
-		if (e.code == 'ENOENT') {
-			return {
-				error: '404',
-				notfound: true,
-			};
-		} else {
-			console.log(e);
-			return {
-				error: `${e}`,
-				notfound: false,
-			};
-		}
+		throw new Error(e);
 	}
 }

@@ -32,13 +32,21 @@ app.use(
 );
 
 app.get('/', async (c) => {
-	const result = await getFileList('./');
-	return c.json(result);
+	let q = c.req.query('offset');
+	let offset = undefined;
+	if (q) {
+		offset = parseInt(q);
+	}
+	let files = await getFileList('./');
+	if (offset) {
+		files = files.slice(offset, offset + 10);
+	}
+	return c.json(files);
 });
 
 app.get('/:path', async (c) => {
-	const result = await getFileList(c.req.param('path'));
-	return c.json(result);
+	let files = await getFileList(c.req.param('path'));
+	return c.json(files);
 });
 
 app.notFound(async (c) => {
